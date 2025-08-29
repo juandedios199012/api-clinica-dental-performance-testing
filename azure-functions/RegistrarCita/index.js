@@ -1,17 +1,26 @@
-const fs = require('fs');
-const path = require('path');
+const { CosmosClient } = require("@azure/cosmos");
+
+const endpoint = process.env.COSMOS_DB_ENDPOINT;
+const key = process.env.COSMOS_DB_KEY;
+const databaseId = "clinicadentalptcosmosdb"; // Cambia por el nombre real de tu base de datos
+const containerId = "cita";
 
 module.exports = async function (context, req) {
-  const DATA_FILE = path.join(__dirname, '../../citas.json');
-  const nuevaCita = req.body;
-  let citas = [];
-  if (fs.existsSync(DATA_FILE)) {
-    citas = JSON.parse(fs.readFileSync(DATA_FILE));
+  const client = new CosmosClient({ endpoint, key });
+  const cita = req.body;
+  cita.id = cita.id || Date.now().toString(); // Asegura un id único
+
+  try {
+    const container = client.database(databaseId).container(containerId);
+    await container.items.create(cita);
+    context.res = {
+      status: 201,
+      body: { mensaje: "Cita registrada", cita }
+    };
+  } catch (error) {
+    context.res = {
+      status: 500,
+      body: { error: error.message }
+    };
   }
-  citas.push(nuevaCita);
-  fs.writeFileSync(DATA_FILE, JSON.stringify(citas, null, 2));
-  context.res = {
-    status: 201,
-    body: { mensaje: 'Cita registrada', cita: nuevaCita }
-  };
 };
