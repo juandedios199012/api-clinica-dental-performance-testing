@@ -10,12 +10,15 @@ module.exports = async function (context, req) {
 
   try {
     const container = client.database(databaseId).container(containerId);
+    context.log("Consultando citas en Cosmos DB...");
     const { resources: citas } = await container.items.readAll().fetchAll();
+    context.log("Citas encontradas:", citas);
     context.res = {
       status: 200,
       body: citas
     };
   } catch (error) {
+    context.log.error("Error al consultar citas:", error);
     context.res = {
       status: 500,
       body: { error: error.message }

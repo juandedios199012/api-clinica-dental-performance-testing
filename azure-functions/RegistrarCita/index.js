@@ -12,12 +12,16 @@ module.exports = async function (context, req) {
 
   try {
     const container = client.database(databaseId).container(containerId);
+    context.log("Registrando cita en Cosmos DB...");
+    context.log("Datos de la cita:", cita);
     await container.items.create(cita);
+    context.log("Cita registrada correctamente.");
     context.res = {
       status: 201,
       body: { mensaje: "Cita registrada", cita }
     };
   } catch (error) {
+    context.log.error("Error al registrar la cita:", error);
     context.res = {
       status: 500,
       body: { error: error.message }
