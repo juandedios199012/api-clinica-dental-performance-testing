@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Cita - Clínica Dental</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f6fbfc;
+      color: #2d3e50;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #4fc3f7;
+      color: #fff;
+      padding: 1rem 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    nav {
+      margin-top: 0.5rem;
+    }
+    nav a {
+      color: #fff;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .container {
+      max-width: 500px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 16px rgba(76,195,247,0.08);
+      padding: 2rem;
+    }
+    h2 {
+      color: #009688;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    select, input[type="date"], textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #b2ebf2;
+      border-radius: 4px;
+      background: #f6fbfc;
+    }
+    .horas-disponibles {
+      margin-bottom: 1rem;
+      background: #e0f7fa;
+      padding: 0.5rem;
+      border-radius: 4px;
+      min-height: 2rem;
+    }
+    button {
+      background: #009688;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #00796b;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Clínica Dental Sonrisa Saludable</h1>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Registro de Cita</a>
+      <a href="#">Contacto</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>Registro de Cita</h2>
+    <form id="form-cita">
+      <label for="doctor">Seleccione el médico</label>
+      <select id="doctor" name="doctor" required>
+        <option value="">-- Seleccione --</option>
+        <option value="perez">Dr. Pérez</option>
+        <option value="lopez">Dra. López</option>
+        <option value="ramirez">Dr. Ramírez</option>
+      </select>
+
+      <label for="servicio">Elija el servicio</label>
+      <select id="servicio" name="servicio" required>
+        <option value="">-- Seleccione --</option>
+        <option value="limpieza">Limpieza profunda</option>
+        <option value="brackets">Brackets</option>
+        <option value="ortodoncia">Ortodoncia</option>
+        <option value="general">Odontología General</option>
+      </select>
+
+      <label for="fecha">Seleccione la fecha de su cita</label>
+      <input type="date" id="fecha" name="fecha" required />
+
+      <label>Horas disponibles</label>
+      <div class="horas-disponibles" id="horas-disponibles">Seleccione médico y fecha</div>
+
+      <label for="comentario">Comentario adicional</label>
+      <textarea id="comentario" name="comentario" rows="3" placeholder="Escriba aquí su comentario..."></textarea>
+
+      <button type="submit">Registrar Cita</button>
+    </form>
+  </div>
+  <script>
+    // Simulación de disponibilidad: cada médico atiende en horarios fijos en agosto
+    const horariosPorMedico = {
+      perez: ['09:00', '10:00', '11:00', '12:00'],
+      lopez: ['13:00', '14:00', '15:00'],
+      ramirez: ['08:00', '09:30', '11:30'],
+    };
+
+    const doctorSelect = document.getElementById('doctor');
+    const fechaInput = document.getElementById('fecha');
+    const horasDiv = document.getElementById('horas-disponibles');
+
+    function esAgosto(fechaStr) {
+      // fechaStr formato: yyyy-mm-dd
+      return /^2025-08-\d{2}$/.test(fechaStr);
+    }
+
+    function mostrarHoras() {
+      const doctor = doctorSelect.value;
+      const fecha = fechaInput.value;
+      if (doctor && fecha) {
+        if (esAgosto(fecha)) {
+          const horas = horariosPorMedico[doctor] || [];
+          if (horas.length > 0) {
+            horasDiv.innerHTML = horas.map(h => `<button type=\"button\" onclick=\"seleccionarHora('${h}')\">${h}</button>`).join(' ');
+          } else {
+            horasDiv.textContent = 'No hay horas disponibles para este médico.';
+          }
+        } else {
+          horasDiv.textContent = 'Solo se muestran horas disponibles para fechas de agosto 2025.';
+        }
+      } else {
+        horasDiv.textContent = 'Seleccione médico y fecha';
+      }
+    }
+
+    doctorSelect.addEventListener('change', mostrarHoras);
+    fechaInput.addEventListener('change', mostrarHoras);
+
+    let horaSeleccionada = '';
+    function seleccionarHora(hora) {
+      horaSeleccionada = hora;
+      horasDiv.innerHTML = `<strong>Hora seleccionada:</strong> ${hora}`;
+    }
+
+    document.getElementById('form-cita').addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!horaSeleccionada) {
+        alert('Por favor seleccione una hora disponible.');
+        return;
+      }
+      const cita = {
+        doctor: doctorSelect.value,
+        servicio: document.getElementById('servicio').value,
+        fecha: fechaInput.value,
+        hora: horaSeleccionada,
+        comentario: document.getElementById('comentario').value
+      };
+      fetch('http://localhost:3000/api/citas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cita)
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert('Cita registrada correctamente en el microservicio.');
+      })
+      .catch(err => {
+        alert('Error al registrar la cita en el microservicio.');
+        console.error(err);
+      });
+    });
+  </script>
+</body>
+</html>

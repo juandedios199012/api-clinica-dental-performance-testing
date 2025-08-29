@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Paciente - Clínica Dental</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f6fbfc;
+      color: #2d3e50;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #4fc3f7;
+      color: #fff;
+      padding: 1rem 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    nav {
+      margin-top: 0.5rem;
+    }
+    nav a {
+      color: #fff;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .container {
+      max-width: 500px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 16px rgba(76,195,247,0.08);
+      padding: 2rem;
+    }
+    h2 {
+      color: #009688;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #b2ebf2;
+      border-radius: 4px;
+      background: #f6fbfc;
+    }
+    .checkbox {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .checkbox input {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+    button {
+      background: #009688;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #00796b;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Clínica Dental Sonrisa Saludable</h1>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Registro de Cita</a>
+      <a href="#">Registro de Paciente</a>
+      <a href="#">Contacto</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>Registro de Paciente</h2>
+    <form id="form-paciente">
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre" required />
+
+      <label for="apellido">Apellido</label>
+      <input type="text" id="apellido" name="apellido" required />
+
+      <label for="correo">Correo Electrónico</label>
+      <input type="email" id="correo" name="correo" required />
+
+      <label for="telefono">Número de Teléfono</label>
+      <input type="tel" id="telefono" name="telefono" required />
+
+      <label for="pais">País</label>
+      <select id="pais" name="pais" required>
+        <option value="">-- Seleccione --</option>
+        <option value="peru">Perú</option>
+        <option value="mexico">México</option>
+        <option value="colombia">Colombia</option>
+        <option value="espana">España</option>
+        <option value="argentina">Argentina</option>
+      </select>
+
+      <label for="ciudad">Ciudad</label>
+      <select id="ciudad" name="ciudad" required>
+        <option value="">-- Seleccione país primero --</option>
+      </select>
+
+      <label for="direccion">Dirección</label>
+      <textarea id="direccion" name="direccion" rows="2" required></textarea>
+
+      <div class="checkbox">
+        <input type="checkbox" id="privacidad" name="privacidad" required />
+        <label for="privacidad">Acepto la política de privacidad de datos</label>
+      </div>
+
+      <button type="submit">Registrar Paciente</button>
+    </form>
+  </div>
+  <script>
+    // Ciudades por país
+    const ciudades = {
+  peru: ['Lima', 'Arequipa', 'Cusco', 'Trujillo'],
+  mexico: ['Ciudad de México', 'Guadalajara', 'Monterrey', 'Puebla'],
+  colombia: ['Bogotá', 'Medellín', 'Cali', 'Barranquilla'],
+  espana: ['Madrid', 'Barcelona', 'Valencia', 'Sevilla'],
+  argentina: ['Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza']
+    };
+
+    const paisSelect = document.getElementById('pais');
+    const ciudadSelect = document.getElementById('ciudad');
+
+    paisSelect.addEventListener('change', function() {
+      const pais = paisSelect.value;
+      ciudadSelect.innerHTML = '<option value="">-- Seleccione --</option>';
+      if (ciudades[pais]) {
+        ciudades[pais].forEach(function(ciudad) {
+          const opt = document.createElement('option');
+          opt.value = ciudad.toLowerCase().replace(/ /g, '-');
+          opt.textContent = ciudad;
+          ciudadSelect.appendChild(opt);
+        });
+      } else {
+        ciudadSelect.innerHTML = '<option value="">-- Seleccione país primero --</option>';
+      }
+    });
+
+    document.getElementById('form-paciente').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Paciente registrado correctamente.');
+      // Aquí podrías guardar el paciente en localStorage o mostrarlo en pantalla
+    });
+  </script>
+</body>
+</html>

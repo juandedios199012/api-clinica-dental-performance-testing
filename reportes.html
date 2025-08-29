@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes Interactivos - Clínica Dental</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f6fbfc;
+      color: #2d3e50;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #4fc3f7;
+      color: #fff;
+      padding: 1rem 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    nav {
+      margin-top: 0.5rem;
+    }
+    nav a {
+      color: #fff;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 16px rgba(76,195,247,0.08);
+      padding: 2rem;
+    }
+    h2 {
+      color: #009688;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .filtros {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      justify-content: center;
+    }
+    .filtros label {
+      font-weight: 500;
+      margin-right: 0.5rem;
+    }
+    .filtros select, .filtros input {
+      padding: 0.4rem;
+      border-radius: 4px;
+      border: 1px solid #b2ebf2;
+      background: #f6fbfc;
+    }
+    .graficas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+    .grafica {
+      background: #e3f2fd;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(76,195,247,0.08);
+      text-align: center;
+    }
+    canvas {
+      margin: 1rem auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(76,195,247,0.08);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Clínica Dental Sonrisa Saludable</h1>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Registro de Cita</a>
+      <a href="#">Registro de Paciente</a>
+      <a href="#">Reportes</a>
+      <a href="#">Contacto</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>Reportes Interactivos</h2>
+    <div class="filtros">
+      <label for="fecha-desde">Fecha desde:</label>
+      <input type="date" id="fecha-desde" name="fecha-desde" />
+      <label for="fecha-hasta">Fecha hasta:</label>
+      <input type="date" id="fecha-hasta" name="fecha-hasta" />
+      <label for="sucursal">Sucursal:</label>
+      <select id="sucursal">
+        <option value="">Todas</option>
+        <option value="lima">Lima</option>
+        <option value="bogota">Bogotá</option>
+        <option value="mexico">Ciudad de México</option>
+        <option value="madrid">Madrid</option>
+        <option value="cordoba">Córdoba</option>
+      </select>
+      <label for="servicio">Tipo de Servicio:</label>
+      <select id="servicio">
+        <option value="">Todos</option>
+        <option value="general">Odontología general</option>
+        <option value="ortodoncia">Ortodoncia</option>
+        <option value="estetica">Estética dental</option>
+        <option value="cirugia">Cirugía oral e implantes</option>
+        <option value="urgencias">Urgencias odontológicas</option>
+        <option value="examenes">Exámenes y radiología dental</option>
+      </select>
+      <label for="publico">Público objetivo:</label>
+      <select id="publico">
+        <option value="">Todos</option>
+        <option value="eps">EPS</option>
+        <option value="aseguradoras">Aseguradoras</option>
+        <option value="particulares">Particulares</option>
+        <option value="entidades">Entidades asociadas</option>
+      </select>
+    </div>
+    <div class="graficas">
+      <div class="grafica">
+        <h3>Citas Atendidas vs Canceladas</h3>
+        <canvas id="citasCanvas" width="320" height="180"></canvas>
+      </div>
+      <div class="grafica">
+        <h3>Procedimientos por Especialización y Hospitalización en Urgencias</h3>
+        <canvas id="procedimientosCanvas" width="320" height="180"></canvas>
+      </div>
+      <div class="grafica">
+        <h3>Atención por Tipo de Servicio</h3>
+        <canvas id="servicioCanvas" width="320" height="180"></canvas>
+      </div>
+      <div class="grafica">
+        <h3>Pagos Pendientes vs Cobrados</h3>
+        <canvas id="pagosCanvas" width="320" height="180"></canvas>
+      </div>
+      <div class="grafica">
+        <h3>Costo por Servicio</h3>
+        <canvas id="costoCanvas" width="320" height="180"></canvas>
+      </div>
+      <div class="grafica">
+        <h3>Exámenes Realizados</h3>
+        <canvas id="examenesCanvas" width="320" height="180"></canvas>
+      </div>
+      <div class="grafica">
+        <h3>Reporte de Quejas y/o Reclamos</h3>
+        <canvas id="quejasCanvas" width="320" height="180"></canvas>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Datos simulados para los reportes por filtro
+    const datosPorFiltro = {
+      sucursal: {
+        lima: { citas: [100, 120, 130, 140, 150, 160, 155, 170], canceladas: [8, 9, 7, 10, 6, 5, 8, 4] },
+        bogota: { citas: [80, 90, 100, 110, 120, 130, 125, 140], canceladas: [6, 7, 5, 8, 4, 3, 6, 2] },
+        mexico: { citas: [110, 125, 140, 150, 160, 170, 165, 180], canceladas: [9, 10, 8, 12, 7, 6, 9, 5] },
+        madrid: { citas: [70, 80, 90, 100, 110, 120, 115, 130], canceladas: [5, 6, 4, 7, 3, 2, 5, 1] },
+        cordoba: { citas: [60, 70, 80, 90, 100, 110, 105, 120], canceladas: [4, 5, 3, 6, 2, 1, 4, 1] },
+        '': { citas: [120, 135, 150, 160, 170, 180, 175, 190], canceladas: [10, 12, 8, 15, 9, 7, 11, 6] }
+      },
+      servicio: {
+        general: { procedimientos: [80, 0, 0, 0, 0], atenciones: [80, 0, 0, 0, 0, 0], costo: [400, 0, 0, 0, 0] },
+        ortodoncia: { procedimientos: [0, 40, 0, 0, 0], atenciones: [0, 40, 0, 0, 0, 0], costo: [0, 1200, 0, 0, 0] },
+        estetica: { procedimientos: [0, 0, 30, 0, 0], atenciones: [0, 0, 30, 0, 0, 0], costo: [0, 0, 800, 0, 0] },
+        cirugia: { procedimientos: [0, 0, 0, 20, 0], atenciones: [0, 0, 0, 20, 0, 0], costo: [0, 0, 0, 1500, 0] },
+        urgencias: { procedimientos: [0, 0, 0, 0, 15], atenciones: [0, 0, 0, 0, 15, 0], costo: [0, 0, 0, 0, 600] },
+        examenes: { procedimientos: [0, 0, 0, 0, 0], atenciones: [0, 0, 0, 0, 0, 25], costo: [0, 0, 0, 0, 0] },
+        '': { procedimientos: [40, 30, 80, 20, 15], atenciones: [80, 40, 30, 20, 15, 25], costo: [1200, 800, 400, 1500, 600] }
+      },
+      publico: {
+        eps: { pagos: [10, 40], quejas: [2, 1] },
+        aseguradoras: { pagos: [5, 30], quejas: [1, 0] },
+        particulares: { pagos: [8, 50], quejas: [1, 1] },
+        entidades: { pagos: [2, 10], quejas: [1, 0] },
+        '': { pagos: [25, 75], quejas: [5, 2] }
+      }
+    };
+
+    // Inicializar los gráficos
+    let citasChart, procedimientosChart, servicioChart, pagosChart, costoChart, examenesChart, quejasChart;
+
+    function actualizarGraficos() {
+      const sucursal = document.getElementById('sucursal').value;
+      const servicio = document.getElementById('servicio').value;
+      const publico = document.getElementById('publico').value;
+
+      // Citas atendidas vs canceladas
+      const citasData = {
+        labels: ['Enero', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'],
+        datasets: [
+          {
+            label: 'Atendidas',
+            data: datosPorFiltro.sucursal[sucursal].citas,
+            borderColor: '#009688',
+            backgroundColor: 'rgba(0,150,136,0.1)',
+          },
+          {
+            label: 'Canceladas',
+            data: datosPorFiltro.sucursal[sucursal].canceladas,
+            borderColor: '#f44336',
+            backgroundColor: 'rgba(244,67,54,0.1)',
+          }
+        ]
+      };
+      // Procedimientos por especialización y hospitalización
+      const procedimientosData = {
+        labels: ['Ortodoncia', 'Estética', 'General', 'Cirugía', 'Urgencias'],
+        datasets: [
+          {
+            label: 'Procedimientos',
+            data: datosPorFiltro.servicio[servicio].procedimientos,
+            backgroundColor: ['#42a5f5','#4fc3f7','#009688','#fbc02d','#f44336'],
+          }
+        ]
+      };
+      // Atención por tipo de servicio
+      const servicioData = {
+        labels: ['General', 'Ortodoncia', 'Estética', 'Cirugía', 'Urgencias', 'Exámenes'],
+        datasets: [
+          {
+            label: 'Atenciones',
+            data: datosPorFiltro.servicio[servicio].atenciones,
+            backgroundColor: '#42a5f5',
+          }
+        ]
+      };
+      // Pagos pendientes vs cobrados
+      const pagosData = {
+        labels: ['Pendientes', 'Cobrados'],
+        datasets: [
+          {
+            label: 'Pagos',
+            data: datosPorFiltro.publico[publico].pagos,
+            backgroundColor: ['#fbc02d','#009688'],
+          }
+        ]
+      };
+      // Costo por servicio
+      const costoData = {
+        labels: ['Ortodoncia', 'Estética', 'General', 'Cirugía', 'Urgencias'],
+        datasets: [
+          {
+            label: 'Costo ($)',
+            data: datosPorFiltro.servicio[servicio].costo,
+            backgroundColor: ['#42a5f5','#4fc3f7','#009688','#fbc02d','#f44336'],
+          }
+        ]
+      };
+      // Exámenes realizados (no depende de filtros)
+      const examenesData = {
+        labels: ['Radiología', 'Limpieza', 'Extracción', 'Implantes'],
+        datasets: [
+          {
+            label: 'Exámenes',
+            data: [50, 70, 30, 20],
+            backgroundColor: ['#42a5f5','#4fc3f7','#009688','#fbc02d'],
+          }
+        ]
+      };
+      // Quejas y/o reclamos
+      const quejasData = {
+        labels: ['Quejas', 'Reclamos'],
+        datasets: [
+          {
+            label: 'Cantidad',
+            data: datosPorFiltro.publico[publico].quejas,
+            backgroundColor: ['#f44336','#fbc02d'],
+          }
+        ]
+      };
+
+      // Actualizar o crear los gráficos
+      if (citasChart) { citasChart.data = citasData; citasChart.update(); }
+      else citasChart = new Chart(document.getElementById('citasCanvas'), { type: 'line', data: citasData, options: {responsive: false} });
+
+      if (procedimientosChart) { procedimientosChart.data = procedimientosData; procedimientosChart.update(); }
+      else procedimientosChart = new Chart(document.getElementById('procedimientosCanvas'), { type: 'bar', data: procedimientosData, options: {responsive: false} });
+
+      if (servicioChart) { servicioChart.data = servicioData; servicioChart.update(); }
+      else servicioChart = new Chart(document.getElementById('servicioCanvas'), { type: 'bar', data: servicioData, options: {responsive: false} });
+
+      if (pagosChart) { pagosChart.data = pagosData; pagosChart.update(); }
+      else pagosChart = new Chart(document.getElementById('pagosCanvas'), { type: 'doughnut', data: pagosData, options: {responsive: false} });
+
+      if (costoChart) { costoChart.data = costoData; costoChart.update(); }
+      else costoChart = new Chart(document.getElementById('costoCanvas'), { type: 'doughnut', data: costoData, options: {responsive: false} });
+
+      if (examenesChart) { examenesChart.data = examenesData; examenesChart.update(); }
+      else examenesChart = new Chart(document.getElementById('examenesCanvas'), { type: 'doughnut', data: examenesData, options: {responsive: false} });
+
+      if (quejasChart) { quejasChart.data = quejasData; quejasChart.update(); }
+      else quejasChart = new Chart(document.getElementById('quejasCanvas'), { type: 'doughnut', data: quejasData, options: {responsive: false} });
+    }
+
+    // Inicializar y agregar listeners a los filtros
+    document.getElementById('sucursal').addEventListener('change', actualizarGraficos);
+    document.getElementById('servicio').addEventListener('change', actualizarGraficos);
+    document.getElementById('publico').addEventListener('change', actualizarGraficos);
+
+    window.onload = actualizarGraficos;
+  </script>
+  </script>
+</body>
+</html>

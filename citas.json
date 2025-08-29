@@ -1,0 +1,25 @@
+[
+  {
+    "doctor": "perez",
+    "servicio": "brackets",
+    "fecha": "2025-08-29",
+    "hora": "09:00",
+    "comentario": "microservicio test"
+  },
+  {
+    "doctor": "lopez",
+    "servicio": "general",
+    "fecha": "2025-08-30",
+    "hora": "14:00",
+    "comentario": "microservicio test 2"
+  },
+  {
+    "comentario": "react test",
+    "telefono": "987789987",
+    "correo": "ramirez@gmail.com",
+    "hora": "09:30",
+    "fecha": "2025-08-30",
+    "servicio": "ortodoncia",
+    "doctor": "ramirez"
+  }
+]

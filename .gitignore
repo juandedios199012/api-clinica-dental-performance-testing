@@ -1,0 +1,23 @@
+# Node.js
+node_modules/
+.env
+*.log
+npm-debug.log*
+
+# Azure Functions local files
+.local.settings.json
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+/dist/
+/build/
+
+# Others
+*.swp
+*.swo
