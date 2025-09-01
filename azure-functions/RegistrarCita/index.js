@@ -9,6 +9,7 @@ module.exports = async function (context, req) {
   const client = new CosmosClient({ endpoint, key });
   const cita = req.body;
   cita.id = cita.id || Date.now().toString(); // Asegura un id único
+  context.log("Objeto cita recibido para guardar:", JSON.stringify(cita));
 
   // Validación básica de campos requeridos
   const camposRequeridos = ["doctor", "servicio", "fecha", "hora", "comentario", "telefono", "correo", "id"];
@@ -16,7 +17,7 @@ module.exports = async function (context, req) {
   if (faltantes.length > 0) {
     context.res = {
       status: 400,
-      body: { error: `Faltan los siguientes campos requeridos: ${faltantes.join(", ")}` }
+      body: { error: `Faltan los siguientes campos requeridos: ${faltantes.join(", ")}`, cita }
     };
     return;
   }
@@ -26,7 +27,7 @@ module.exports = async function (context, req) {
   if (!fechaRegex.test(cita.fecha)) {
     context.res = {
       status: 400,
-      body: { error: "El campo 'fecha' debe estar en formato AAAA-MM-DD o DD-MM-AAAA." }
+      body: { error: "El campo 'fecha' debe estar en formato AAAA-MM-DD o DD-MM-AAAA.", cita }
     };
     return;
   }
@@ -36,7 +37,7 @@ module.exports = async function (context, req) {
   if (!horaRegex.test(cita.hora)) {
     context.res = {
       status: 400,
-      body: { error: "El campo 'hora' debe estar en formato HH:MM." }
+      body: { error: "El campo 'hora' debe estar en formato HH:MM.", cita }
     };
     return;
   }
@@ -55,7 +56,7 @@ module.exports = async function (context, req) {
     context.log.error("Error al registrar la cita:", error);
     context.res = {
       status: 500,
-      body: { error: error.message }
+      body: { error: error.message, cita }
     };
   }
 };
