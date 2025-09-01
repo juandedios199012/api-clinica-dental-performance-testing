@@ -14,7 +14,8 @@ module.exports = async function (context, req) {
     context.log("Objeto cita recibido para guardar:", JSON.stringify(cita));
 
     // Validación básica de campos requeridos
-    const camposRequeridos = ["doctor", "servicio", "fecha", "hora", "comentario", "telefono", "correo", "id"];
+  // const camposRequeridos = ["doctor", "servicio", "fecha", "hora", "comentario", "telefono", "correo", "id"];
+  const camposRequeridos = ["doctor", "servicio", /* "fecha", */ "hora", "comentario", "telefono", "correo", "id"];
     const faltantes = camposRequeridos.filter(campo => !cita[campo] || cita[campo].toString().trim() === "");
     if (faltantes.length > 0) {
       context.res = {
@@ -25,14 +26,14 @@ module.exports = async function (context, req) {
     }
 
     // Validación de formato de fecha (acepta AAAA-MM-DD o DD-MM-AAAA)
-    const fechaRegex = /^(\d{4}-\d{2}-\d{2}|\d{2}-\d{2}-\d{4})$/;
-    if (!fechaRegex.test(cita.fecha)) {
-      context.res = {
-        status: 400,
-        body: { error: "El campo 'fecha' debe estar en formato AAAA-MM-DD o DD-MM-AAAA.", cita }
-      };
-      return;
-    }
+    // const fechaRegex = /^(\d{4}-\d{2}-\d{2}|\d{2}-\d{2}-\d{4})$/;
+    // if (!fechaRegex.test(cita.fecha)) {
+    //   context.res = {
+    //     status: 400,
+    //     body: { error: "El campo 'fecha' debe estar en formato AAAA-MM-DD o DD-MM-AAAA.", cita }
+    //   };
+    //   return;
+    // }
 
     // Validación de formato de hora (HH:MM)
     const horaRegex = /^\d{2}:\d{2}$/;
