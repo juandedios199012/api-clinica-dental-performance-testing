@@ -75,6 +75,9 @@ jobs:
       - name: List files before deploy
         run: ls -l
 
+      - name: List files in RegistrarCita before deploy
+        run: ls -l RegistrarCita
+
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
