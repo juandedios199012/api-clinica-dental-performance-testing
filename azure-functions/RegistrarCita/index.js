@@ -1,3 +1,4 @@
+
 const { CosmosClient } = require("@azure/cosmos");
 
 const endpoint = process.env.COSMOS_DB_ENDPOINT;
@@ -5,13 +6,13 @@ const key = process.env.COSMOS_DB_KEY;
 const databaseId = "clinicadentalptcosmosdb"; // Cambia por el nombre real de tu base de datos
 const containerId = "cita";
 
+if (!endpoint || !key) {
+  throw new Error("Faltan las variables de entorno COSMOS_DB_ENDPOINT o COSMOS_DB_KEY");
+}
+
 module.exports = async function (context, req) {
   let cita;
   try {
-    // Mostrar los valores de las variables de entorno en la respuesta para Postman
-  context.log("COSMOS_DB_ENDPOINT:", endpoint);
-  context.log("COSMOS_DB_KEY:", key);
-
     cita = req.body;
     cita.id = cita.id || Date.now().toString(); // Asegura un id único
     context.log("Objeto cita recibido para guardar:", JSON.stringify(cita));
@@ -22,7 +23,7 @@ module.exports = async function (context, req) {
     if (faltantes.length > 0) {
       context.res = {
         status: 400,
-        body: { error: `Faltan los siguientes campos requeridos: ${faltantes.join(", ")}`, cita, endpoint, key }
+        body: { error: `Faltan los siguientes campos requeridos: ${faltantes.join(", ")}`, cita }
       };
       return;
     }
@@ -32,7 +33,7 @@ module.exports = async function (context, req) {
     if (!horaRegex.test(cita.hora)) {
       context.res = {
         status: 400,
-        body: { error: "El campo 'hora' debe estar en formato HH:MM.", cita, endpoint, key }
+        body: { error: "El campo 'hora' debe estar en formato HH:MM.", cita }
       };
       return;
     }
@@ -44,14 +45,14 @@ module.exports = async function (context, req) {
     await container.items.create(cita);
     context.log("Cita registrada correctamente.");
     context.res = {
-  status: 201,
-  body: { mensaje: "Cita registrada", cita, endpoint, key }
+      status: 201,
+      body: { mensaje: "Cita registrada", cita }
     };
   } catch (error) {
     context.log.error("Error al registrar la cita:", error);
     context.res = {
       status: 500,
-      body: { error: error.message, cita, endpoint, key }
+      body: { error: error.message, cita, stack: error.stack }
     };
   }
 };
