@@ -11,5 +11,8 @@
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
     "express": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=18 <19"
   }
 }
