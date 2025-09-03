@@ -59,6 +59,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
+          # ensure artifact is downloaded into ./node-app by default; we'll copy the release.zip to workspace root next
+          path: node-app
 
       - name: Show downloaded artifact files
         run: |
@@ -76,6 +78,18 @@ jobs:
             find . -maxdepth 3 -type f -name "release.zip" -print || true
           fi
 
+      - name: Prepare package for deployment
+        run: |
+          if [ -f node-app/release.zip ]; then
+            cp node-app/release.zip ./release.zip
+            echo "Copied node-app/release.zip -> ./release.zip"
+          elif [ -f release.zip ]; then
+            echo "release.zip already at ./release.zip"
+          else
+            echo "ERROR: release.zip not found; listing files:" && find . -maxdepth 4 -type f -name "release.zip" -print || true
+            exit 1
+          fi
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -89,4 +103,4 @@ jobs:
         with:
           app-name: 'clinicaDentalfunctions'
           slot-name: 'Production'
-          package: ./node-app/release.zip
+          package: ./release.zip
